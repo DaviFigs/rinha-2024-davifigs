@@ -2,11 +2,10 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
-app.post('clientes/{id}/transacoes')
+@app.post("/clientes/{id}/transacoes")
 def transacoes(id:int, valor:int, tipo:str, descricao:str):
-    pass
+    return {'teste':'teste'}
 
-app.get('clientes/{id}/extrato')
+@app.get('/clientes/{id}/extrato')
 def extrato(id:int):
-    pass
+    return {'teste':'teste'}
