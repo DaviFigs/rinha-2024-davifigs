@@ -16,9 +16,10 @@ services:
       - API_USE_DB_FUNC=true
       - PORT=3000
     ports:
-      - "3001:3000"
+      - "8000:8000"
     depends_on:
       - db
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
     deploy:
       resources:
         limits:
@@ -29,11 +30,9 @@ services:
     <<: *api
     hostname: api02 
     ports:
-      - "3002:3000"
+      - "8001:8000"
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8001
   
-
-
-
   nginx:
     image: nginx:latest
     volumes:
@@ -60,7 +59,7 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_DB=rinha
     ports:
-      - "5432:5432"
+      - "5000:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     command: postgres -c checkpoint_timeout=600 -c max_wal_size=4096 -c synchronous_commit=0 -c full_page_writes=0
