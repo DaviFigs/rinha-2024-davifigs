@@ -5,9 +5,9 @@ services:
   api01:
     hostname: api01
     build: .
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
     ports:
-      - "8000:8000"
+      - "8001:8001"
     environment:
       - CONN_URL=postgresql+pycopg2://admin:123@localhost:5433/rinha
       - DB_HOST=localhost
@@ -15,7 +15,7 @@ services:
       - DB_PASSWORD=rinha
       - DB_NAME=rinhabackenddb
       - DB_PORT=5433
-      - PORT=8000
+      - PORT=8001
     depends_on:
       - db
     deploy:
@@ -27,9 +27,9 @@ services:
   api02:
     hostname: api02
     build: .
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
     ports:
-      - "8001:8001"
+      - "8002:8002"
     environment:
       - CONN_URL=postgresql+pycopg2://admin:123@localhost:5433/rinha
       - DB_HOST=localhost
@@ -37,7 +37,7 @@ services:
       - DB_PASSWORD=rinha
       - DB_NAME=rinhabackenddb
       - DB_PORT=5433
-      - PORT=8000
+      - PORT=8002
     depends_on:
       - db
     deploy:
