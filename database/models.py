@@ -1,13 +1,12 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from .connection import engine
 from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
 
 class Cliente(Base):
-    __tableame__ = "cliente"
+    __tablename__ = "cliente"
     id = Column(Integer, primary_key=True)
     nome = Column(String(50), nullable=False)
     limite = Column(Integer, nullable=False)
@@ -28,12 +27,3 @@ class Saldo(Base):
     valor = Column(Integer, nullable=False)
     cliente = relationship("Cliente",back_populates="transacao")
 
-
-tabelas = ["cliente", "transacao","saldo"]
-ddl1 = """
-    CREATE TABLE IF NOT EXISTS{}(
-        id serial primary key,
-        nome varchar(50) not null,
-        limite integer not null
-    );
-""".format(tabelas[0])
