@@ -89,5 +89,3 @@ networks:
   default:
     driver: bridge
     name: rinha-nginx-2024q1
-
-
