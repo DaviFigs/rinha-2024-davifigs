@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+'''from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -27,7 +27,7 @@ class Saldos(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     cliente_id =Column(Integer, ForeignKey("clientes.id"), nullable=False)
     valor = Column(Integer, nullable=False)
-    cliente = relationship("Clientes",back_populates="saldos")
+    cliente = relationship("Clientes",back_populates="saldos")'''
 
 
 

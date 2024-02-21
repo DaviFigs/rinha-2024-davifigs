@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from testes import teste1
+from database.connection import connect
 
 app = FastAPI()
 
@@ -13,4 +13,5 @@ def extrato(id:int):
 
 @app.get("/teste")
 def teste():
-    teste1.teste1()
+    query = connect()
+    return {'test':f'{query}'}
