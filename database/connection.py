@@ -1,17 +1,3 @@
-'''from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-def return_session():
-    Session = sessionmaker(bind=return_engine())
-    session = Session()
-    return session
-
-def return_engine():
-    CONN_STRING = "postgresql://admin:123@db:5433/rinha"
-    #CONN_STRING = "postgresql://postgres:postgres@localhost:5432/banco-teste"
-    engine = create_engine(CONN_STRING, echo=True)
-    return engine
-'''
 import psycopg2
 from configparser import ConfigParser
 
@@ -40,3 +26,30 @@ def connect():
     
     except(Exception, psycopg2.DatabaseError) as error:
         print(error)
+
+
+from peewee import *
+
+banco = PostgresqlDatabase('banco-teste', user='postgres', password='postgres', host='localhost', port=5432)
+
+class Cliente(Model):
+    nome = CharField(max_length=50)
+    limite = IntegerField(null=False)
+    class Meta:
+        database = banco
+        table_name = 'clientes'
+
+
+def testebabay():
+    banco.connect()
+
+    clientes = Cliente.select()
+    print(type(clientes))
+    obj = {}
+    lista = []
+
+    for i in clientes:
+        lista.append(i)
+
+    print(lista)
+    return lista

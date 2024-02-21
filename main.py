@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from database import queries as qs
+from database.connection import testebabay
 
 app = FastAPI()
 
@@ -13,5 +14,5 @@ def extrato(id:int):
 
 @app.get("/teste")
 def teste():
-    select = qs.select()
+    select = testebabay()
     return {'test':f'{select}'}
