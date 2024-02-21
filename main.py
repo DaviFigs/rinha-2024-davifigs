@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from database import queries as qs
 from database.connection import testebabay
-
+import json
 app = FastAPI()
 
 @app.post("/clientes/{id}/transacoes")
@@ -15,4 +15,5 @@ def extrato(id:int):
 @app.get("/teste")
 def teste():
     select = testebabay()
-    return {'test':f'{select}'}
+
+    return select

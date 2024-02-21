@@ -29,6 +29,7 @@ def connect():
 
 
 from peewee import *
+import json
 
 banco = PostgresqlDatabase('banco-teste', user='postgres', password='postgres', host='localhost', port=5432)
 
@@ -46,10 +47,16 @@ def testebabay():
     clientes = Cliente.select()
     print(type(clientes))
     obj = {}
-    lista = []
-
+    obj['clientes'] = []
+    cliente ={}
+    
     for i in clientes:
-        lista.append(i)
+        cliente = {
+            'id':i.id,
+            'nome':i.nome,
+            'limite':i.limite
+        }
+        obj['clientes'].append(cliente)
 
-    print(lista)
-    return lista
+    print(obj)
+    return obj
