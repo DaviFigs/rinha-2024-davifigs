@@ -32,27 +32,11 @@ def config(filename="database.ini", section="postgresql"):
     return db
 
 def connect():
-    connection = None
     try:
         params = config()
         print('Connecting to the postgreSQL database ...')
         connection = psycopg2.connect(**params)
-
-        # create a cursor
-        crsr = connection.cursor()
-        print('PostgreSQL database version: ')
-        query = crsr.execute('SELECT * FROM clientes;')
-        print(query)
-        query = crsr.fetchone()
-        print(query)
-        crsr.close()
-        return query
+        return connection
+    
     except(Exception, psycopg2.DatabaseError) as error:
         print(error)
-    finally:
-        if connection is not None:
-            connection.close()
-            print('Database connection terminated.')
-
-if __name__ == "__main__":
-    connect()
