@@ -41,7 +41,8 @@ def connect():
         # create a cursor
         crsr = connection.cursor()
         print('PostgreSQL database version: ')
-        crsr.execute('SELECT * FROM clientes;')
+        query = crsr.execute('SELECT * FROM clientes;')
+        print(query)
         query = crsr.fetchone()
         print(query)
         crsr.close()

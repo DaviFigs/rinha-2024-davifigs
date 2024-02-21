@@ -23,17 +23,13 @@ CREATE TABLE saldos (
 		FOREIGN KEY (cliente_id) REFERENCES clientes(id)
 );
 
-INSERT INTO clientes
-VALUES
-	(default, 'o barato sai caro', 1000 * 100),
-	(default, 'zan corp ltda', 800 * 100),
-	(default, 'les cruders', 10000 * 100),
-	(default, 'padaria joia de cocaia', 100000 * 100),
-	(default, 'kid mais', 5000 * 100);
-
-
-
-
+INSERT INTO clientes VALUES(default, 'o barato sai caro', 1000 * 100);
+INSERT INTO clientes VALUES(default, 'zan corp ltda', 800 * 100);
+INSERT INTO clientes VALUES(default, 'les cruders', 10000 * 100);
+INSERT INTO clientes VALUES(default, 'padaria joia de cocaia', 100000 * 100);
+INSERT INTO clientes VALUES(default, 'kid mais', 5000 * 100);
+	
+	
 CREATE OR REPLACE FUNCTION debitar(
 	cliente_id_tx INT,
 	valor_tx INT,
