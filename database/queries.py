@@ -3,13 +3,6 @@ from datetime import datetime
 from fastapi import HTTPException
 from .models import BANCO, Cliente, Transacao, Saldo
 
-
-#validar cliente
-#validar transicao
-#efetuar transicao de modo que as duas sejam feitas
-#verificar se a transição feita não excede o limite de sua conta
-#atualizar saldo do cliente (diminuindo o valor da transicao que ele fez)
-
 @BANCO.atomic()
 def debitar(cliente:Cliente, valor:int,descricao:str):
     try:
