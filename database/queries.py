@@ -14,6 +14,10 @@ def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
         clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
         if clientes:#verifica se ele existe
             if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
+
+                #verificar o tipo de transação e se ela satisfaz as condições da rinha
+
+                #efetua transição de fato (precisamos atualizar os dados do cliente!)
                 transacao = Transacao.create(cliente_id = id, valor=valor, tipo=tipo, descricao =descricao, realizada_em=str(datetime.now().isoformat()))
                 print('transacao criada')
                 print(transacao.valor, transacao.realizada_em)
