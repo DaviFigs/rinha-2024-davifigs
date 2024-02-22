@@ -1,33 +1,32 @@
-'''from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
+from peewee import *
+import json
+from datetime import datetime
+
+BANCO = PostgresqlDatabase('banco-teste', user='postgres', password='postgres', host='localhost', port=5432)
 
 
-Base = declarative_base()
+class Cliente(Model):
+    nome = CharField(max_length=50)
+    limite = IntegerField(null=False)
+    class Meta:
+        database = BANCO
+        table_name = 'clientes'
 
-class Clientes(Base):
-    __tablename__ = "clientes"
-    id = Column(Integer, primary_key=True)
-    nome = Column(String(50), nullable=False)
-    limite = Column(Integer, nullable=False)
-    transacoes = relationship("Transacoes", back_populates="clientes")
-    saldos = relationship("Saldos", back_populates="clientes")
+class Transacao(Model):
+    cliente_id = ForeignKeyField(Cliente,backref='transacoes')
+    valor = IntegerField(null=False)
+    tipo = CharField(max_length=1, null=False)
+    descricao = CharField(max_length=10, null=False)
+    realizada_em = CharField(max_length=30, null=False)
+    class Meta:
+        database = BANCO
+        table_name = 'transacoes'
 
-class Transacoes(Base):
-    __tablename__ = "transacoes"
-    id = Column(Integer, primary_key=True, nullable=False)
-    cliente_id =Column(Integer, ForeignKey("clientes.id"), nullable=False)
-    valor = Column(Integer, nullable=False)
-    tipo = Column(String(1), nullable=False)
-    descricao = Column(String(10), nullable=False)
-    cliente = relationship("Clientes",back_populates="transacoes")
-
-class Saldos(Base):
-    __tablename__ = "saldos"
-    id = Column(Integer, primary_key=True, nullable=False)
-    cliente_id =Column(Integer, ForeignKey("clientes.id"), nullable=False)
-    valor = Column(Integer, nullable=False)
-    cliente = relationship("Clientes",back_populates="saldos")'''
-
+class Saldo(Model):
+    cliente_id = ForeignKeyField(Cliente,backref='transacoes')
+    valor = IntegerField(null=False)
+    class Meta:
+        database = BANCO
+        table_name = 'saldos'
 
 

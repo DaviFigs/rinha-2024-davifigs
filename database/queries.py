@@ -1,31 +1,71 @@
-from . import connection as cn 
-import json
+from peewee import *
+from datetime import datetime
+from .models import BANCO, Cliente, Transacao, Saldo
 
-class Query:
-    def __init__(self) -> None:
-        self.connection = cn.connect()
-        self.cursor = self.connection.cursor()
 
-def select():
-    query = Query()
+#validar cliente
+#validar transicao
+#efetuar transicao de modo que as duas sejam feitas
+#verificar se a transição feita não excede o limite de sua conta
+#atualizar saldo do cliente (diminuindo o valor da transicao que ele fez)
+def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
+    BANCO.connect()
+    try:
+        clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
+        if clientes:#verifica se ele existe
+            if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
+                transacao = Transacao.create(cliente_id = id, valor=valor, tipo=tipo, descricao =descricao, realizada_em=str(datetime.now().isoformat()))
+                print('transacao criada')
+                print(transacao.valor, transacao.realizada_em)
+            else:
+                print('descricao maior que 10 caracteres ou operação inválida!')
+        else:
+            print('cliente nao existe!')
+        
+    except Exception as e:
+        return print({f'{e}'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def retornar_clientes():
+    BANCO.connect()
+
+    clientes = Cliente.select()
+    obj = {}
+    obj['clientes'] = []
+    cliente ={}
     
-    select = query.cursor.execute('SELECT * FROM clientes;')
-    select = query.cursor.fetchall()
-    query.cursor.close()
-    return json.dumps(select)
+    for i in clientes:
+        cliente = {
+            'id':i.id,
+            'nome':i.nome,
+            'limite':i.limite
+        }
+        obj['clientes'].append(cliente)
+    return obj
 
 
 
-
-'''
-connection = None
-# create a cursor
-cursor = connection.cursor()
-print('PostgreSQL database version: ')
-query = cursor.execute('SELECT * FROM pessoa;')
-print(query)
-query = cursor.fetchall()
-print(query)
-cursor.close()
-return query
-'''
+def retorna_transacoes(id:int):
+    BANCO.connect()
