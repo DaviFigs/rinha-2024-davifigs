@@ -11,13 +11,16 @@ from .models import BANCO, Cliente, Transacao, Saldo
 
 @BANCO.atomic()
 def debitar(cliente:Cliente, valor:int):
-    saldo = Saldo.select().where(Saldo.cliente_id == cliente.id)
-    limite = cliente.limite
-    if valor > limite or saldo.valor - valor < limite*-1:
-        return {"erro":'422'}
-    else:
-        #transaction
-
+    try:
+        saldo = Saldo.select().where(Saldo.cliente_id == cliente.id)
+        limite = cliente.limite
+        if valor > limite or saldo.valor - valor < limite*-1:
+            return {"erro":'422'}
+        else:
+            pass
+    except Exception as e:
+        return {f'{e}'}
+        
 
 
     
