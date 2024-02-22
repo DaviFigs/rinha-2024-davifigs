@@ -3,6 +3,35 @@ from datetime import datetime
 from fastapi import HTTPException
 from .models import BANCO, Cliente, Transacao, Saldo
 
+#bloco de funções de transicão
+def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
+    BANCO.connect()
+    try:
+        clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
+        if clientes:#verifica se ele existe
+            cliente = clientes[0]
+            if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
+                if tipo == 'c':
+                    dados = creditar(cliente=cliente, valor=valor, descricao=descricao)
+                    BANCO.close()
+                    return dados
+                elif tipo == 'd':
+                    dados = debitar(cliente=cliente, valor=valor, descricao=descricao)
+                    BANCO.close()
+                    return dados
+            else:
+                BANCO.close()
+                return HTTPException(status_code=422)
+        else:
+            BANCO.close()
+            return HTTPException(status_code=404)
+        
+    except Exception as e:
+        BANCO.close()
+        return print({f'{e}'})
+
+
+
 @BANCO.atomic()
 def debitar(cliente:Cliente, valor:int,descricao:str):
     try:
@@ -31,7 +60,6 @@ def debitar(cliente:Cliente, valor:int,descricao:str):
         return {f'{e}'}
         
 
-
 @BANCO.atomic()
 def creditar(cliente:Cliente, valor:int, descricao:str):
     try:
@@ -52,35 +80,9 @@ def creditar(cliente:Cliente, valor:int, descricao:str):
             'saldo':saldo.valor
         }
         return retorno
-
-
     except Exception as e:
         return {f'{e}'}
         
-
-def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
-    BANCO.connect()
-    try:
-        clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
-        if clientes:#verifica se ele existe
-            cliente = clientes[0]
-            if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
-                if tipo == 'c':
-                    creditar(cliente=cliente, valor=valor, descricao=descricao)
-                elif tipo == 'd':
-                    dados = debitar(cliente=cliente, valor=valor, descricao=descricao)
-                    BANCO.close()
-                    return dados
-            else:
-                BANCO.close()
-                return HTTPException(status_code=422)
-        else:
-            BANCO.close()
-            return HTTPException(status_code=404)
-        
-    except Exception as e:
-        BANCO.close()
-        return print({f'{e}'})
 
 
 
