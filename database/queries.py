@@ -1,5 +1,6 @@
 from peewee import *
 from datetime import datetime
+from fastapi import HTTPException
 from .models import BANCO, Cliente, Transacao, Saldo
 
 
@@ -10,14 +11,29 @@ from .models import BANCO, Cliente, Transacao, Saldo
 #atualizar saldo do cliente (diminuindo o valor da transicao que ele fez)
 
 @BANCO.atomic()
-def debitar(cliente:Cliente, valor:int):
+def debitar(cliente:Cliente, valor:int,descricao:str):
     try:
-        saldo = Saldo.select().where(Saldo.cliente_id == cliente.id)
+        id =  cliente.id
         limite = cliente.limite
-        if valor > limite or saldo.valor - valor < limite*-1:
-            return {"erro":'422'}
+        saldos = Saldo.select().where(Saldo.cliente_id == cliente.id)
+        if saldos:
+            saldo = saldos[0]
         else:
-            pass
+            saldo = Saldo.create(cliente_id=id, valor=0)
+
+        if valor > limite or saldo.valor - valor < limite*-1:
+            return HTTPException(status_code=422, detail="Operação compromete o sistema")
+        else:
+            transacao = Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
+            saldo.valor -= valor
+            transacao.save()
+            saldo.save()
+            
+            retorno = {
+                'limite':cliente.limite,
+                'saldo':saldo.valor
+            }
+            return retorno
     except Exception as e:
         return {f'{e}'}
         
@@ -27,40 +43,28 @@ def debitar(cliente:Cliente, valor:int):
 def creditar(id:int, valor:int):
     pass
 
-
-
 def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
     BANCO.connect()
     try:
         clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
         if clientes:#verifica se ele existe
             cliente = clientes[0]
-            print(cliente.nome)
             if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
-
                 if tipo == 'c':
                     creditar()
                 elif tipo == 'd':
-                    debitar()
-
-
-
-
-
-
-
-                #verificar o tipo de transação e se ela satisfaz as condições da rinha
-
-                #efetua transição de fato (precisamos atualizar os dados do cliente!)
-                transacao = Transacao.create(cliente_id = id, valor=valor, tipo=tipo, descricao =descricao, realizada_em=str(datetime.now().isoformat()))
-                print('transacao criada')
-                print(transacao.valor, transacao.realizada_em)
+                    dados = debitar(cliente=cliente, valor=valor, descricao=descricao)
+                    BANCO.close()
+                    return dados
             else:
-                print('descricao maior que 10 caracteres ou operação inválida!')
+                BANCO.close()
+                return HTTPException(status_code=422)
         else:
-            print('cliente nao existe!')
+            BANCO.close()
+            return HTTPException(status_code=404)
         
     except Exception as e:
+        BANCO.close()
         return print({f'{e}'})
 
 
