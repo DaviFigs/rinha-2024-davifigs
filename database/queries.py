@@ -9,6 +9,7 @@ from .models import BANCO, Cliente, Transacao, Saldo
 #verificar se a transição feita não excede o limite de sua conta
 #atualizar saldo do cliente (diminuindo o valor da transicao que ele fez)
 
+@BANCO.atomic()
 def debitar(cliente:Cliente, valor:int):
     saldo = Saldo.select().where(Saldo.cliente_id == cliente.id)
     limite = cliente.limite
