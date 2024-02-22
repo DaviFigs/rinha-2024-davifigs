@@ -8,12 +8,42 @@ from .models import BANCO, Cliente, Transacao, Saldo
 #efetuar transicao de modo que as duas sejam feitas
 #verificar se a transição feita não excede o limite de sua conta
 #atualizar saldo do cliente (diminuindo o valor da transicao que ele fez)
+
+def debitar(cliente:Cliente, valor:int):
+    saldo = Saldo.select().where(Saldo.cliente_id == cliente.id)
+    limite = cliente.limite
+    if valor > limite or saldo.valor - valor < limite*-1:
+        return {"erro":'422'}
+    else:
+        #transaction
+
+
+
+    
+def creditar(id:int, valor:int):
+    pass
+
+
+
 def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
     BANCO.connect()
     try:
         clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
         if clientes:#verifica se ele existe
+            cliente = clientes[0]
+            print(cliente.nome)
             if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
+
+                if tipo == 'c':
+                    creditar()
+                elif tipo == 'd':
+                    debitar()
+
+
+
+
+
+
 
                 #verificar o tipo de transação e se ela satisfaz as condições da rinha
 
