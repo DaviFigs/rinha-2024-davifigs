@@ -14,4 +14,8 @@ def transacoes(id:int, valor:int, tipo:str, descricao:str):
 @app.get('/clientes/{id}/extrato')
 def extrato(id:int):
     select = qr.get_extrato(id=id)
-    return select
+    if type(select) == dict:
+        return select
+    else:
+        raise HTTPException(status_code=select)
+    

@@ -83,21 +83,53 @@ def creditar(cliente:Cliente, valor:int, descricao:str):
     except Exception as e:
         return {f'{e}'}
         
+
+
+
+
+
 def get_extrato(id:int):
     try:
         clientes = Cliente.select().where(Cliente.id == id)
         if clientes:
             cliente = clientes[0]
-            saldo = get_saldo(cliente).valor
-            print(saldo)
+            saldo = get_saldo(cliente.id).valor
+            data_extrato = datetime.now().isoformat()
+            ultimas_transacoes = get_transacoes(cliente.id)
+            
+            retorno = {
+                'saldo':{
+                    'total':saldo,
+                    'data_extrato':data_extrato,
+                    'limite':cliente.limite
+                },
+                'ultimas_transacoes': ultimas_transacoes
+            }
+            return retorno
         else:
             raise 404
     except Exception as e:
         return f'{e}'
 
 
-def get_saldo(cliente:Cliente):
-    saldo = Saldo.get(Saldo.cliente_id == cliente.id)
+def get_transacoes(id:int):
+    query = Transacao.select().where(Transacao.cliente_id == id)
+    transacoes = []
+    transacao = {}
+
+    for i in query:
+        transacao = {
+            'valor':i.valor,
+            'tipo':i.tipo,
+            'descricao':i.descricao,
+            'realizada_em':i.realizada_em
+        }
+        transacoes.append(transacao)
+
+    return transacoes
+
+def get_saldo(id:int):
+    saldo = Saldo.get(Saldo.cliente_id == id)
     return saldo
     
 
