@@ -21,10 +21,10 @@ def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
                     return dados
             else:
                 BANCO.close()
-                return HTTPException(status_code=422)
+                raise 422
         else:
             BANCO.close()
-            return HTTPException(status_code=404)
+            raise 404
         
     except Exception as e:
         BANCO.close()
@@ -83,9 +83,23 @@ def creditar(cliente:Cliente, valor:int, descricao:str):
     except Exception as e:
         return {f'{e}'}
         
+def get_extrato(id:int):
+    try:
+        clientes = Cliente.select().where(Cliente.id == id)
+        if clientes:
+            cliente = clientes[0]
+            saldo = get_saldo(cliente).valor
+            print(saldo)
+        else:
+            raise 404
+    except Exception as e:
+        return f'{e}'
 
 
-
+def get_saldo(cliente:Cliente):
+    saldo = Saldo.get(Saldo.cliente_id == cliente.id)
+    return saldo
+    
 
 
 

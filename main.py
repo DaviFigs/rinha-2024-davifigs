@@ -6,8 +6,12 @@ app = FastAPI()
 @app.post("/clientes/{id}/transacoes")
 def transacoes(id:int, valor:int, tipo:str, descricao:str):
     select = qr.fazer_transacao(id, valor, tipo, descricao)
-    return select
+    if type(select) == dict:
+        return select
+    else:
+        raise HTTPException(status_code=select)
 
 @app.get('/clientes/{id}/extrato')
 def extrato(id:int):
-    return {'teste':'teste'}
+    select = qr.get_extrato(id=id)
+    return select
