@@ -1,4 +1,5 @@
 from peewee import *
+import asyncio
 from datetime import datetime
 from .models import BANCO, Cliente, Transacao, Saldo
 
