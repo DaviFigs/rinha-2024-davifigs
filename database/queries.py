@@ -95,13 +95,17 @@ def get_extrato(id:int):
         clientes = Cliente.select().where(Cliente.id == id)
         if clientes:
             cliente = clientes[0]
-            saldo = get_saldo(cliente.id).valor
+            saldo = get_saldo(cliente.id)
             data_extrato = datetime.now().isoformat()
             ultimas_transacoes = get_transacoes(cliente.id)
             
+            if ultimas_transacoes == 422:
+                BANCO.close()
+                raise 422
+            
             retorno = {
                 'saldo':{
-                    'total':saldo,
+                    'total':saldo.valor,
                     'data_extrato':data_extrato,
                     'limite':cliente.limite
                 },
@@ -118,21 +122,30 @@ def get_extrato(id:int):
 
 
 def get_transacoes(id:int):
-    query = Transacao.select().where(Transacao.cliente_id == id).order_by(-Transacao.realizada_em).limit(10)#pega as últimas 10 transações 
-    transacoes = []
-    transacao = {}
+    query = Transacao.select().where(Transacao.cliente_id == id).order_by(-Transacao.realizada_em).limit(10)
+    if query: 
+        transacoes = []
+        transacao = {}
 
-    for i in query:
-        transacao = {
-            'valor':i.valor,
-            'tipo':i.tipo,
-            'descricao':i.descricao,
-            'realizada_em':i.realizada_em
-        }
-        transacoes.append(transacao)
+        for i in query:
+            transacao = {
+                'valor':i.valor,
+                'tipo':i.tipo,
+                'descricao':i.descricao,
+                'realizada_em':i.realizada_em
+            }
+            transacoes.append(transacao)
 
-    return transacoes
+        return transacoes
+    else:
+        return 422
 
 def get_saldo(id:int):
-    saldo = Saldo.get(Saldo.cliente_id == id)
-    return saldo
+    #saldo = Saldo.get(Saldo.cliente_id == id)
+    saldos = Saldo.select().where(Saldo.cliente_id == id)
+    if saldo:
+        saldo = saldos[0]
+        return saldo
+    else:
+        saldo = Saldo.create(cliente_id = id, valor=0)
+        return saldo
