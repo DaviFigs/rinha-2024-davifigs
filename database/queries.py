@@ -18,14 +18,16 @@ def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
                     return dados
                 elif tipo == 'd':
                     dados = debitar(cliente=cliente, valor=valor, descricao=descricao)
+                    if debitar == 422:
+                        return 422
                     BANCO.close()
                     return dados
             else:
                 BANCO.close()
-                raise 422
+                return 422
         else:
             BANCO.close()
-            raise 404
+            return 404
         
     except Exception as e:
         BANCO.close()
@@ -45,7 +47,7 @@ def debitar(cliente:Cliente, valor:int,descricao:str):
             saldo = Saldo.create(cliente_id=id, valor=0)
 
         if valor > limite or saldo.valor - valor < limite*-1:
-            return HTTPException(status_code=422, detail="Operação compromete o sistema")
+            return 422
         else:
             transacao = Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
             saldo.valor -= valor
@@ -96,12 +98,14 @@ def get_extrato(id:int):
         if clientes:
             cliente = clientes[0]
             saldo = get_saldo(cliente.id)
+            #print(f'saldo:{saldo} ')
             data_extrato = datetime.now().isoformat()
             ultimas_transacoes = get_transacoes(cliente.id)
+            #print(ultimas_transacoes)
             
-            if ultimas_transacoes == 422:
+            if ultimas_transacoes == 404 or saldo == 404:
                 BANCO.close()
-                raise 422
+                return 404
             
             retorno = {
                 'saldo':{
@@ -115,7 +119,7 @@ def get_extrato(id:int):
             return retorno
         else:
             BANCO.close()
-            raise 404
+            return 404
     except Exception as e:
         BANCO.close()
         return f'{e}'
@@ -138,14 +142,13 @@ def get_transacoes(id:int):
 
         return transacoes
     else:
-        return 422
+        return 404
 
 def get_saldo(id:int):
-    #saldo = Saldo.get(Saldo.cliente_id == id)
     saldos = Saldo.select().where(Saldo.cliente_id == id)
-    if saldo:
+    if saldos:
         saldo = saldos[0]
         return saldo
     else:
-        saldo = Saldo.create(cliente_id = id, valor=0)
-        return saldo
+        return 404
+    
