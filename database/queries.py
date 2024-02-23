@@ -3,7 +3,8 @@ from datetime import datetime
 from fastapi import HTTPException
 from .models import BANCO, Cliente, Transacao, Saldo
 
-#bloco de funções de transicão
+
+#FUNÇÕES ASSOCIADAS AO PRIMEIRO ENDPOINT (/clientes/id/transacoes)
 def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
     BANCO.connect()
     try:
@@ -84,12 +85,13 @@ def creditar(cliente:Cliente, valor:int, descricao:str):
         return {f'{e}'}
         
 
-
+#FUNÇÕES ASSOCIADAS AO SEGUNDO ENDPOINT /clientes/id/extrato
 
 
 
 def get_extrato(id:int):
     try:
+        BANCO.connect()
         clientes = Cliente.select().where(Cliente.id == id)
         if clientes:
             cliente = clientes[0]
@@ -105,15 +107,18 @@ def get_extrato(id:int):
                 },
                 'ultimas_transacoes': ultimas_transacoes
             }
+            BANCO.close()
             return retorno
         else:
+            BANCO.close()
             raise 404
     except Exception as e:
+        BANCO.close()
         return f'{e}'
 
 
 def get_transacoes(id:int):
-    query = Transacao.select().where(Transacao.cliente_id == id)
+    query = Transacao.select().where(Transacao.cliente_id == id).order_by(-Transacao.realizada_em).limit(10)#pega as últimas 10 transações 
     transacoes = []
     transacao = {}
 
@@ -131,46 +136,3 @@ def get_transacoes(id:int):
 def get_saldo(id:int):
     saldo = Saldo.get(Saldo.cliente_id == id)
     return saldo
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def retornar_clientes():
-    BANCO.connect()
-
-    clientes = Cliente.select()
-    obj = {}
-    obj['clientes'] = []
-    cliente ={}
-    
-    for i in clientes:
-        cliente = {
-            'id':i.id,
-            'nome':i.nome,
-            'limite':i.limite
-        }
-        obj['clientes'].append(cliente)
-    return obj
-
-
-
-def retorna_transacoes(id:int):
-    BANCO.connect()
