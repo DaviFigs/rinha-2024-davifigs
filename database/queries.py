@@ -1,6 +1,5 @@
 from peewee import *
 from datetime import datetime
-from fastapi import HTTPException
 from .models import BANCO, Cliente, Transacao, Saldo
 
 
@@ -98,10 +97,9 @@ def get_extrato(id:int):
         if clientes:
             cliente = clientes[0]
             saldo = get_saldo(cliente.id)
-            #print(f'saldo:{saldo} ')
+            
             data_extrato = datetime.now().isoformat()
             ultimas_transacoes = get_transacoes(cliente.id)
-            #print(ultimas_transacoes)
             
             if ultimas_transacoes == 404 or saldo == 404:
                 BANCO.close()
