@@ -6,9 +6,9 @@ services:
     restart: unless-stopped
     hostname: api01
     build: .
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
-      - "8001:8001"
+      - "8001:8000"
     environment:
       - DB_USER=admin
       - DB_PASSWORD=123
@@ -20,16 +20,16 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.55"
-          memory: "200MB"
+          cpus: "0.5"
+          memory: "160MB"
 
   api02:
     restart: unless-stopped
     hostname: api02
     build: .
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
-      - "8002:8002"
+      - "8002:8000"
     environment:
       - DB_USER=admin
       - DB_PASSWORD=123
@@ -41,8 +41,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.55"
-          memory: "200MB"
+          cpus: "0.5"
+          memory: "160MB"
 
 
   nginx:
@@ -59,7 +59,7 @@ services:
       resources:
         limits:
           cpus: "0.15"
-          memory: "10MB"
+          memory: "30MB"
 
   db:
     container_name: database
@@ -77,8 +77,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.25"
-          memory: "140MB"
+          cpus: "0.15"
+          memory: "300MB"
 
 
 networks:
