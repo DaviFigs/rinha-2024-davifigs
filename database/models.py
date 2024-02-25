@@ -1,9 +1,7 @@
 from peewee import *
-import json
-from datetime import datetime
 
-BANCO = PostgresqlDatabase('banco-teste', user='postgres', password='postgres', host='localhost', port=5432)
-
+#BANCO = PostgresqlDatabase('banco-teste', user='postgres', password='postgres', host='localhost', port=5432)
+BANCO = PostgresqlDatabase('rinha', user='admin', password='123', host='database', port=5432)
 
 class Cliente(Model):
     nome = CharField(max_length=50)
