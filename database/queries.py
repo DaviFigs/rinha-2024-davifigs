@@ -8,7 +8,7 @@ from .models import BANCO, Cliente, Transacao, Saldo
 async def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
     BANCO.connect()
     try:
-        clientes = await Cliente.select().where(Cliente.id == id)#busca o cliente no banco
+        clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
         if clientes:#verifica se ele existe
             cliente = clientes[0]
             if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
@@ -31,7 +31,7 @@ async def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
         
     except Exception as e:
         BANCO.close()
-        return print({f'{e}'})
+        return print({f'{e} bosta'})
 
 
 
@@ -67,7 +67,7 @@ async def debitar(cliente:Cliente, valor:int,descricao:str):
 async def creditar(cliente:Cliente, valor:int, descricao:str):
     try:
         id = cliente.id
-        saldos = await Saldo.select().where(Saldo.cliente_id == cliente.id)
+        saldos =  Saldo.select().where(Saldo.cliente_id == cliente.id)
         if saldos:
             saldo = saldos[0]
         else:
