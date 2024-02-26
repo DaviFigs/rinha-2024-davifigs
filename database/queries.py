@@ -31,7 +31,7 @@ async def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
         
     except Exception as e:
         BANCO.close()
-        return print({f'{e} bosta'})
+        return print({f'{e} AQUI O ERRO PORRA'})
 
 
 
@@ -40,19 +40,19 @@ async def debitar(cliente:Cliente, valor:int,descricao:str):
     try:
         id = cliente.id
         limite = cliente.limite
-        saldos = await Saldo.select().where(Saldo.cliente_id == cliente.id)
+        saldos = Saldo.select().where(Saldo.cliente_id == cliente.id)
         if saldos:
             saldo = saldos[0]
         else:
-            saldo = await Saldo.create(cliente_id=id, valor=0)
+            saldo = Saldo.create(cliente_id=id, valor=0)
 
         if valor > limite or saldo.valor - valor < limite*-1:
             return 422
         else:
-            transacao = await Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
+            transacao = Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
             saldo.valor -= valor
-            await transacao.save()
-            await saldo.save()
+            saldo.save()
+            transacao.save()
             
             retorno = {
                 'limite':cliente.limite,
@@ -60,23 +60,23 @@ async def debitar(cliente:Cliente, valor:int,descricao:str):
             }
             return retorno
     except Exception as e:
-        return {f'{e}'}
+        return {f'{e} AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
         
 
 @BANCO.atomic()
 async def creditar(cliente:Cliente, valor:int, descricao:str):
     try:
         id = cliente.id
-        saldos =  Saldo.select().where(Saldo.cliente_id == cliente.id)
+        saldos = Saldo.select().where(Saldo.cliente_id == cliente.id)
         if saldos:
             saldo = saldos[0]
         else:
-            saldo = await Saldo.create(cliente_id = id, valor=0)
-        transacao = await Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
+            saldo = Saldo.create(cliente_id = id, valor=0)
+        transacao = Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
 
         saldo.valor -= valor
-        await transacao.save()
-        await saldo.save()
+        transacao.save()
+        saldo.save()
         
         retorno = {
             'limite':cliente.limite,
@@ -84,7 +84,7 @@ async def creditar(cliente:Cliente, valor:int, descricao:str):
         }
         return retorno
     except Exception as e:
-        return {f'{e}'}
+        return {f'{e} AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
         
 
 #FUNÇÕES ASSOCIADAS AO SEGUNDO ENDPOINT /clientes/id/extrato
@@ -94,12 +94,12 @@ async def creditar(cliente:Cliente, valor:int, descricao:str):
 async def get_extrato(id:int):
     try:
         BANCO.connect()
-        clientes = await Cliente.select().where(Cliente.id == id)
+        clientes = Cliente.select().where(Cliente.id == id)
         if clientes:
             cliente = clientes[0]
             saldo = await get_saldo(cliente.id)
             
-            data_extrato = await datetime.now().isoformat()
+            data_extrato = datetime.now().isoformat()
             ultimas_transacoes = await get_transacoes(cliente.id)
             
             if ultimas_transacoes == 404 or saldo == 404:
@@ -121,11 +121,11 @@ async def get_extrato(id:int):
             return 404
     except Exception as e:
         BANCO.close()
-        return f'{e}'
+        return f'{e} AQQQQQQQQQQQ'
 
 
 async def get_transacoes(id:int):
-    query = await Transacao.select().where(Transacao.cliente_id == id).order_by(-Transacao.realizada_em).limit(10)
+    query = Transacao.select().where(Transacao.cliente_id == id).order_by(-Transacao.realizada_em).limit(10)
     if query: 
         transacoes = []
         transacao = {}
@@ -144,7 +144,7 @@ async def get_transacoes(id:int):
         return 404
 
 async def get_saldo(id:int):
-    saldos = await Saldo.select().where(Saldo.cliente_id == id)
+    saldos = Saldo.select().where(Saldo.cliente_id == id)
     if saldos:
         saldo = saldos[0]
         return saldo

@@ -4,16 +4,16 @@ import json
 app = FastAPI()
 
 @app.post("/clientes/{id}/transacoes")
-def transacoes(id:int, valor:int, tipo:str, descricao:str):
-    select = qr.fazer_transacao(id, valor, tipo, descricao)
+async def transacoes(id:int, valor:int, tipo:str, descricao:str):
+    select = await qr.fazer_transacao(id, valor, tipo, descricao)
     if type(select) == dict:
         return select
     else:
         raise HTTPException(status_code=select)
 
 @app.get('/clientes/{id}/extrato')
-def extrato(id:int):
-    select = qr.get_extrato(id=id)
+async def extrato(id:int):
+    select = await qr.get_extrato(id=id)
     if type(select) == dict:
         return select
     else:
