@@ -4,7 +4,7 @@ app = FastAPI()
 
 @app.post("/clientes/{id}/transacoes")
 async def transacoes(id:int, valor:int, tipo:str, descricao:str):
-    select = await qr.fazer_transacao(id, valor, tipo, descricao)
+    select = qr.fazer_transacao(id, valor, tipo, descricao)
     if type(select) == dict:
         return select
     else:
@@ -12,7 +12,7 @@ async def transacoes(id:int, valor:int, tipo:str, descricao:str):
 
 @app.get('/clientes/{id}/extrato')
 async def extrato(id:int):
-    select = await qr.get_extrato(id=id)
+    select = qr.get_extrato(id=id)
     if type(select) == dict:
         return select
     else:

@@ -5,7 +5,7 @@ from .models import BANCO, Cliente, Transacao, Saldo
 
 
 #FUNÇÕES ASSOCIADAS AO PRIMEIRO ENDPOINT (/clientes/id/transacoes)
-async def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
+def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
     BANCO.connect()
     try:
         clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
@@ -13,11 +13,11 @@ async def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
             cliente = clientes[0]
             if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
                 if tipo == 'c':
-                    dados = await creditar(cliente=cliente, valor=valor, descricao=descricao)
+                    dados = creditar(cliente=cliente, valor=valor, descricao=descricao)
                     BANCO.close()
                     return dados
                 elif tipo == 'd':
-                    dados = await debitar(cliente=cliente, valor=valor, descricao=descricao)
+                    dados = debitar(cliente=cliente, valor=valor, descricao=descricao)
                     if debitar == 422:
                         return 422
                     BANCO.close()
@@ -31,14 +31,14 @@ async def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
         
     except Exception as e:
         BANCO.close()
-        return print({f'{e} AQUI O ERRO PORRA'})
+        return print({f'{e}'})
 
 
 
 @BANCO.atomic()
-async def debitar(cliente:Cliente, valor:int,descricao:str):
+def debitar(cliente:Cliente, valor:int,descricao:str):
     try:
-        id = cliente.id
+        id =  cliente.id
         limite = cliente.limite
         saldos = Saldo.select().where(Saldo.cliente_id == cliente.id)
         if saldos:
@@ -51,8 +51,8 @@ async def debitar(cliente:Cliente, valor:int,descricao:str):
         else:
             transacao = Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
             saldo.valor -= valor
-            saldo.save()
             transacao.save()
+            saldo.save()
             
             retorno = {
                 'limite':cliente.limite,
@@ -60,11 +60,11 @@ async def debitar(cliente:Cliente, valor:int,descricao:str):
             }
             return retorno
     except Exception as e:
-        return {f'{e} AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+        return {f'{e}'}
         
 
 @BANCO.atomic()
-async def creditar(cliente:Cliente, valor:int, descricao:str):
+def creditar(cliente:Cliente, valor:int, descricao:str):
     try:
         id = cliente.id
         saldos = Saldo.select().where(Saldo.cliente_id == cliente.id)
@@ -72,10 +72,10 @@ async def creditar(cliente:Cliente, valor:int, descricao:str):
             saldo = saldos[0]
         else:
             saldo = Saldo.create(cliente_id = id, valor=0)
-        Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
+        transacao = Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
 
         saldo.valor -= valor
-        #transacao.save()
+        transacao.save()
         saldo.save()
         
         retorno = {
@@ -84,23 +84,23 @@ async def creditar(cliente:Cliente, valor:int, descricao:str):
         }
         return retorno
     except Exception as e:
-        return {f'{e} AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+        return {f'{e}'}
         
 
 #FUNÇÕES ASSOCIADAS AO SEGUNDO ENDPOINT /clientes/id/extrato
 
 
 
-async def get_extrato(id:int):
+def get_extrato(id:int):
     try:
         BANCO.connect()
         clientes = Cliente.select().where(Cliente.id == id)
         if clientes:
             cliente = clientes[0]
-            saldo = await get_saldo(cliente.id)
+            saldo = get_saldo(cliente.id)
             
             data_extrato = datetime.now().isoformat()
-            ultimas_transacoes = await get_transacoes(cliente.id)
+            ultimas_transacoes = get_transacoes(cliente.id)
             
             if ultimas_transacoes == 404 or saldo == 404:
                 BANCO.close()
@@ -121,10 +121,10 @@ async def get_extrato(id:int):
             return 404
     except Exception as e:
         BANCO.close()
-        return f'{e} AQQQQQQQQQQQ'
+        return f'{e}'
 
 
-async def get_transacoes(id:int):
+def get_transacoes(id:int):
     query = Transacao.select().where(Transacao.cliente_id == id).order_by(-Transacao.realizada_em).limit(10)
     if query: 
         transacoes = []
@@ -143,7 +143,7 @@ async def get_transacoes(id:int):
     else:
         return 404
 
-async def get_saldo(id:int):
+def get_saldo(id:int):
     saldos = Saldo.select().where(Saldo.cliente_id == id)
     if saldos:
         saldo = saldos[0]
@@ -151,3 +151,6 @@ async def get_saldo(id:int):
     else:
         return 404
     
+
+
+
