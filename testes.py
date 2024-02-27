@@ -21,11 +21,12 @@ async def teste_async():
         await qr.fazer_transacao(id, 100, 'c', f'teste:{id}')
 
 # Executar o teste não assíncrono
-execucao1 = timeit.timeit(teste_not_async, number=1)
-print(teste_not_async())
+execucao1 = timeit.timeit(teste_not_async, number=2)
+#print(teste_not_async())
 print(f"Tempo teste1 = {execucao1}")
 
 # Executar o teste assíncrono
-execucao2 = timeit.timeit(run_teste_async, number=1)
-print(run_teste_async())
+execucao2 = timeit.timeit(run_teste_async, number=2)
+#print(run_teste_async())
 print(f"Tempo teste2 = {execucao2}")
+

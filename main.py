@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException
 from database import queries as qr
-import json
 app = FastAPI()
 
 @app.post("/clientes/{id}/transacoes")
@@ -19,3 +18,8 @@ async def extrato(id:int):
     else:
         raise HTTPException(status_code=select)
     
+
+@app.get('/teste')
+def teste():
+    select = qr.get_pessoas()
+    return select
