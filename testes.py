@@ -3,7 +3,7 @@ import timeit
 from database import queries as qr
 from database import queries_not_async as qrn
 
-rangs = range(1, 100)
+rangs = range(1, 200)
 # Função síncrona para chamar a função assíncrona
 def run_teste_async():
     asyncio.run(teste_async())
@@ -21,9 +21,11 @@ async def teste_async():
         await qr.fazer_transacao(id, 100, 'c', f'teste:{id}')
 
 # Executar o teste não assíncrono
-execucao1 = timeit.timeit(teste_not_async, number=2)
+execucao1 = timeit.timeit(teste_not_async, number=1)
+print(teste_not_async())
 print(f"Tempo teste1 = {execucao1}")
 
 # Executar o teste assíncrono
-execucao2 = timeit.timeit(run_teste_async, number=2)
+execucao2 = timeit.timeit(run_teste_async, number=1)
+print(run_teste_async())
 print(f"Tempo teste2 = {execucao2}")

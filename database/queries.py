@@ -71,12 +71,12 @@ async def creditar(cliente:Cliente, valor:int, descricao:str):
         if saldos:
             saldo = saldos[0]
         else:
-            saldo = Saldo.create(cliente_id = id, valor=0)
-        transacao = Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
+            saldo = await Saldo.create(cliente_id = id, valor=0)
+        transacao = await Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
 
         saldo.valor -= valor
-        transacao.save()
-        saldo.save()
+        #transacao.save()
+        await saldo.save()
         
         retorno = {
             'limite':cliente.limite,
