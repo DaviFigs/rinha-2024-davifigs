@@ -80,6 +80,11 @@ class RinhaBackendCrebitosSimulation
           }
     )
 
+
+
+
+    
+
   val creditos = scenario("créditos")
     .exec {s =>
       val descricao = randomDescricao()

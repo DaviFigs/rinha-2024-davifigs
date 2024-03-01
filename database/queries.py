@@ -11,7 +11,7 @@ def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
         clientes = Cliente.select().where(Cliente.id == id)#busca o cliente no banco
         if clientes:#verifica se ele existe
             cliente = clientes[0]
-            if len(descricao) <= 10 and tipo == 'c' or tipo =='d':#verifica se os dados da transação são válidos
+            if len(descricao) <= 10 and tipo == "c" or tipo == "d":#verifica se os dados da transação são válidos
                 if tipo == 'c':
                     dados = creditar(cliente=cliente, valor=valor, descricao=descricao)
                     BANCO.close()
@@ -67,9 +67,11 @@ def debitar(cliente:Cliente, valor:int,descricao:str):
 def creditar(cliente:Cliente, valor:int, descricao:str):
     try:
         id = cliente.id
+        limite = cliente.limite
         saldos = Saldo.select().where(Saldo.cliente_id == cliente.id)
         if saldos:
             saldo = saldos[0]
+        
         else:
             saldo = Saldo.create(cliente_id = id, valor=0)
         transacao = Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
@@ -79,7 +81,7 @@ def creditar(cliente:Cliente, valor:int, descricao:str):
         saldo.save()
         
         retorno = {
-            'limite':cliente.limite,
+            'limite':limite,
             'saldo':saldo.valor
         }
         return retorno
@@ -151,6 +153,3 @@ def get_saldo(id:int):
     else:
         return 404
     
-
-
-

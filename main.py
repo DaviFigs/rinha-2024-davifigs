@@ -17,9 +17,3 @@ async def extrato(id:int):
         return select
     else:
         raise HTTPException(status_code=select)
-    
-
-@app.get('/teste')
-def teste():
-    select = qr.get_pessoas()
-    return select
