@@ -62,7 +62,33 @@ def debitar(cliente:Cliente, valor:int,descricao:str):
     except Exception as e:
         return {f'{e}'}
         
+@BANCO.atomic()
+def creditar(cliente:Cliente, valor:int,descricao:str):
+    try:
+        id =  cliente.id
+        limite = cliente.limite
+        saldos = Saldo.select().where(Saldo.cliente_id == cliente.id)
+        if saldos:
+            saldo = saldos[0]
+        else:
+            saldo = Saldo.create(cliente_id=id, valor=0)
 
+        if valor > limite or saldo.valor - valor < limite*-1:
+            return 422
+        else:
+            transacao = Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
+            saldo.valor -= valor
+            transacao.save()
+            saldo.save()
+            
+            retorno = {
+                'limite':cliente.limite,
+                'saldo':saldo.valor
+            }
+            return retorno
+    except Exception as e:
+        return {f'{e}'}
+'''
 @BANCO.atomic()
 def creditar(cliente:Cliente, valor:int, descricao:str):
     try:
@@ -86,7 +112,7 @@ def creditar(cliente:Cliente, valor:int, descricao:str):
         }
         return retorno
     except Exception as e:
-        return {f'{e}'}
+        return {f'{e}'}'''
         
 
 #FUNÇÕES ASSOCIADAS AO SEGUNDO ENDPOINT /clientes/id/extrato
