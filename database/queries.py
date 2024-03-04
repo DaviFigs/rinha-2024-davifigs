@@ -18,7 +18,7 @@ def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
                     return dados
                 elif tipo == 'd':
                     dados = debitar(cliente=cliente, valor=valor, descricao=descricao)
-                    if debitar == 422:
+                    if dados == 422:
                         return 422
                     BANCO.close()
                     return dados
@@ -62,33 +62,7 @@ def debitar(cliente:Cliente, valor:int,descricao:str):
     except Exception as e:
         return {f'{e}'}
         
-@BANCO.atomic()
-def creditar(cliente:Cliente, valor:int,descricao:str):
-    try:
-        id =  cliente.id
-        limite = cliente.limite
-        saldos = Saldo.select().where(Saldo.cliente_id == cliente.id)
-        if saldos:
-            saldo = saldos[0]
-        else:
-            saldo = Saldo.create(cliente_id=id, valor=0)
 
-        if valor > limite or saldo.valor - valor < limite*-1:
-            return 422
-        else:
-            transacao = Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
-            saldo.valor -= valor
-            transacao.save()
-            saldo.save()
-            
-            retorno = {
-                'limite':cliente.limite,
-                'saldo':saldo.valor
-            }
-            return retorno
-    except Exception as e:
-        return {f'{e}'}
-'''
 @BANCO.atomic()
 def creditar(cliente:Cliente, valor:int, descricao:str):
     try:
@@ -100,10 +74,10 @@ def creditar(cliente:Cliente, valor:int, descricao:str):
         
         else:
             saldo = Saldo.create(cliente_id = id, valor=0)
-        transacao = Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
+        Transacao.create(cliente_id=id, valor=valor, tipo='c', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
 
         saldo.valor -= valor
-        transacao.save()
+        #transacao.save()
         saldo.save()
         
         retorno = {
@@ -112,10 +86,12 @@ def creditar(cliente:Cliente, valor:int, descricao:str):
         }
         return retorno
     except Exception as e:
-        return {f'{e}'}'''
+        return {f'{e}'}
         
 
 #FUNÇÕES ASSOCIADAS AO SEGUNDO ENDPOINT /clientes/id/extrato
+
+
 
 
 
@@ -126,7 +102,7 @@ def get_extrato(id:int):
         if clientes:
             cliente = clientes[0]
             saldo = get_saldo(cliente.id)
-            
+
             data_extrato = datetime.now().isoformat()
             ultimas_transacoes = get_transacoes(cliente.id)
             
@@ -152,7 +128,7 @@ def get_extrato(id:int):
         return f'{e}'
 
 
-def get_transacoes(id:int):
+def get_transacoes(id):
     query = Transacao.select().where(Transacao.cliente_id == id).order_by(-Transacao.realizada_em).limit(10)
     if query: 
         transacoes = []
@@ -171,7 +147,7 @@ def get_transacoes(id:int):
     else:
         return 404
 
-def get_saldo(id:int):
+def get_saldo(id):
     saldos = Saldo.select().where(Saldo.cliente_id == id)
     if saldos:
         saldo = saldos[0]
