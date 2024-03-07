@@ -19,6 +19,7 @@ def fazer_transacao(id:int,valor:int, tipo:str, descricao:str):
                 elif tipo == 'd':
                     dados = debitar(cliente=cliente, valor=valor, descricao=descricao)
                     if dados == 422:
+                        BANCO.close()
                         return 422
                     BANCO.close()
                     return dados
@@ -49,9 +50,9 @@ def debitar(cliente:Cliente, valor:int,descricao:str):
         if valor > limite or saldo.valor - valor < limite*-1:
             return 422
         else:
-            transacao = Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
+            Transacao.create(cliente_id=id, valor=valor, tipo='d', descricao=descricao, realizada_em=str(datetime.now().isoformat()))
             saldo.valor -= valor
-            transacao.save()
+            #transacao.save()
             saldo.save()
             
             retorno = {
